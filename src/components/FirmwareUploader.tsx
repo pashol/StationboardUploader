@@ -258,9 +258,9 @@ export default function FirmwareUploader() {
 
   if (!isBrowserSupported) {
     return (
-      <div className="w-full max-w-2xl mx-auto p-6 bg-neutral-milk border border-neutral-silver rounded-lg">
-        <h3 className="text-lg font-semibold text-neutral-charcoal mb-2">{uploader.browserNotSupported.title}</h3>
-        <p className="text-neutral-metal">
+      <div className="w-full max-w-2xl mx-auto p-6 bg-sbb-red border border-sbb-red125 rounded-lg">
+        <h3 className="text-lg font-semibold text-neutral-white mb-2">{uploader.browserNotSupported.title}</h3>
+        <p className="text-neutral-white/90">
           {uploader.browserNotSupported.message}
         </p>
       </div>

@@ -60,7 +60,7 @@ export default function MarketingSection() {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="bg-sbb-red rounded-xl p-6 shadow-sm hover:shadow-lg hover:bg-sbb-red125 transition-all border border-sbb-red150"
+                className="bg-sbb-red rounded-xl p-6 shadow-sm hover:shadow-lg hover:bg-sbb-red125 transition-all border border-sbb-red125"
               >
                 <feature.icon className="w-10 h-10 text-neutral-white mb-4" />
                 <h4 className="font-semibold text-neutral-white mb-2">{feature.title}</h4>
