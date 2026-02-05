@@ -231,10 +231,10 @@ export default function FirmwareUploader() {
 
   const getProgressColor = () => {
     switch (progress.stage) {
-      case 'complete': return 'bg-green-500';
-      case 'error': return 'bg-red-500';
-      case 'flashing': return 'bg-blue-500';
-      default: return 'bg-blue-500';
+      case 'complete': return 'bg-green-600';
+      case 'error': return 'bg-sbb-red';
+      case 'flashing': return 'bg-accent-blue';
+      default: return 'bg-accent-blue';
     }
   };
 
@@ -246,10 +246,10 @@ export default function FirmwareUploader() {
   if (!mounted) {
     return (
       <div className="w-full max-w-2xl mx-auto">
-        <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
+        <div className="bg-neutral-white rounded-xl shadow-lg p-8 border border-neutral-cloud">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">{uploader.title}</h2>
-            <p className="text-gray-600">Loading...</p>
+            <h2 className="text-2xl font-bold text-neutral-charcoal mb-2">{uploader.title}</h2>
+            <p className="text-neutral-metal">Loading...</p>
           </div>
         </div>
       </div>
@@ -258,9 +258,9 @@ export default function FirmwareUploader() {
 
   if (!isBrowserSupported) {
     return (
-      <div className="w-full max-w-2xl mx-auto p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <h3 className="text-lg font-semibold text-yellow-800 mb-2">{uploader.browserNotSupported.title}</h3>
-        <p className="text-yellow-700">
+      <div className="w-full max-w-2xl mx-auto p-6 bg-neutral-milk border border-neutral-silver rounded-lg">
+        <h3 className="text-lg font-semibold text-neutral-charcoal mb-2">{uploader.browserNotSupported.title}</h3>
+        <p className="text-neutral-metal">
           {uploader.browserNotSupported.message}
         </p>
       </div>
@@ -269,10 +269,10 @@ export default function FirmwareUploader() {
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
+      <div className="bg-neutral-white rounded-xl shadow-lg p-8 border border-neutral-cloud">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">{uploader.title}</h2>
-          <p className="text-gray-600">
+          <h2 className="text-2xl font-bold text-neutral-charcoal mb-2">{uploader.title}</h2>
+          <p className="text-neutral-metal">
             {uploader.subtitle}
           </p>
         </div>
@@ -280,7 +280,7 @@ export default function FirmwareUploader() {
         <div className="space-y-6">
           {/* Version Selector */}
           <div className="relative">
-            <label htmlFor="version-select" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="version-select" className="block text-sm font-medium text-neutral-granite mb-2">
               {uploader.selectVersion}
             </label>
             <div className="relative">
@@ -289,7 +289,7 @@ export default function FirmwareUploader() {
                 value={selectedVersion}
                 onChange={(e) => setSelectedVersion(e.target.value)}
                 disabled={versionsLoading || progress.stage !== 'idle'}
-                className="block w-full pl-4 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg border bg-white disabled:bg-gray-100 disabled:text-gray-500 appearance-none cursor-pointer"
+                className="block w-full pl-4 pr-10 py-3 text-base border-neutral-silver focus:outline-none focus:ring-sbb-red focus:border-sbb-red sm:text-sm rounded-lg border bg-neutral-white disabled:bg-neutral-milk disabled:text-neutral-smoke appearance-none cursor-pointer"
               >
                 {versionsLoading ? (
                   <option>Loading versions...</option>
@@ -301,12 +301,12 @@ export default function FirmwareUploader() {
                   ))
                 )}
               </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-neutral-granite">
                 <ChevronDown className="h-5 w-5" />
               </div>
             </div>
             {getSelectedVersionInfo() && (
-              <p className="mt-2 text-xs text-gray-500">
+              <p className="mt-2 text-xs text-neutral-smoke">
                 {uploader.released.replace('{date}', new Date(getSelectedVersionInfo()!.date).toLocaleDateString(undefined, {
                   year: 'numeric',
                   month: 'long',
@@ -316,19 +316,19 @@ export default function FirmwareUploader() {
             )}
           </div>
 
-          <div className="flex items-center justify-center space-x-4 text-sm text-gray-600">
+          <div className="flex items-center justify-center space-x-4 text-sm text-neutral-granite">
             <div className="flex items-center space-x-2">
-              <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">1</span>
+              <span className="w-6 h-6 rounded-full bg-accent-blue/10 text-accent-blue flex items-center justify-center text-xs font-bold">1</span>
               <span>{uploader.step1}</span>
             </div>
-            <div className="w-8 h-px bg-gray-300"></div>
+            <div className="w-8 h-px bg-neutral-silver"></div>
             <div className="flex items-center space-x-2">
-              <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">2</span>
+              <span className="w-6 h-6 rounded-full bg-accent-blue/10 text-accent-blue flex items-center justify-center text-xs font-bold">2</span>
               <span>{uploader.step2}</span>
             </div>
-            <div className="w-8 h-px bg-gray-300"></div>
+            <div className="w-8 h-px bg-neutral-silver"></div>
             <div className="flex items-center space-x-2">
-              <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">3</span>
+              <span className="w-6 h-6 rounded-full bg-accent-blue/10 text-accent-blue flex items-center justify-center text-xs font-bold">3</span>
               <span>{uploader.step3}</span>
             </div>
           </div>
@@ -338,12 +338,12 @@ export default function FirmwareUploader() {
             disabled={progress.stage !== 'idle' && progress.stage !== 'error' && progress.stage !== 'complete'}
             className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-200 ${
               progress.stage === 'complete'
-                ? 'bg-green-600 text-white hover:bg-green-700'
+                ? 'bg-green-600 text-neutral-white hover:bg-green-700'
                 : progress.stage === 'error'
-                ? 'bg-red-600 text-white hover:bg-red-700'
+                ? 'bg-sbb-red text-neutral-white hover:bg-sbb-red125'
                 : progress.stage !== 'idle'
-                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg'
+                ? 'bg-neutral-cement text-neutral-white cursor-not-allowed'
+                : 'bg-sbb-red text-neutral-white hover:bg-sbb-red125 hover:shadow-lg'
             }`}
           >
             {progress.stage === 'idle' && uploader.button.idle.replace('{version}', selectedVersion || 'Latest')}
@@ -358,10 +358,10 @@ export default function FirmwareUploader() {
           {(progress.stage !== 'idle' || progress.message !== 'Ready to flash') && (
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">{progress.message}</span>
-                <span className="text-gray-900 font-medium">{Math.round(progress.progress)}%</span>
+                <span className="text-neutral-metal">{progress.message}</span>
+                <span className="text-neutral-charcoal font-medium">{Math.round(progress.progress)}%</span>
               </div>
-              <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+              <div className="w-full h-3 bg-neutral-cloud rounded-full overflow-hidden">
                 <div
                   className={`h-full transition-all duration-300 ease-out ${getProgressColor()}`}
                   style={{ width: `${progress.progress}%` }}
@@ -370,7 +370,7 @@ export default function FirmwareUploader() {
             </div>
           )}
 
-          <div className="text-xs text-gray-500 text-center space-y-1">
+          <div className="text-xs text-neutral-smoke text-center space-y-1">
             <p>{uploader.deviceInfo}</p>
           </div>
         </div>

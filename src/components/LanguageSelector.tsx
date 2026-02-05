@@ -26,7 +26,7 @@ export default function LanguageSelector() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-700"
+        className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-neutral-milk transition-colors text-neutral-granite"
         aria-label={t.languageSelector.title}
       >
         <Globe className="w-4 h-4" />
@@ -36,7 +36,7 @@ export default function LanguageSelector() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+        <div className="absolute right-0 mt-2 w-48 bg-neutral-white rounded-lg shadow-lg border border-neutral-cloud py-1 z-50">
           {languages.map((lang) => (
             <button
               key={lang.code}
@@ -44,14 +44,14 @@ export default function LanguageSelector() {
                 setLanguage(lang.code);
                 setIsOpen(false);
               }}
-              className={`w-full px-4 py-2 text-left flex items-center space-x-3 hover:bg-gray-50 transition-colors ${
-                language === lang.code ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+              className={`w-full px-4 py-2 text-left flex items-center space-x-3 hover:bg-neutral-milk transition-colors ${
+                language === lang.code ? 'bg-accent-blue/5 text-accent-blue' : 'text-neutral-granite'
               }`}
             >
               <span className="text-lg">{lang.flag}</span>
               <span className="text-sm font-medium">{lang.name}</span>
               {language === lang.code && (
-                <span className="ml-auto text-blue-600">
+                <span className="ml-auto text-accent-blue">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
