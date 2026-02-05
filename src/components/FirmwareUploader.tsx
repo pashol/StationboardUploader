@@ -43,14 +43,18 @@ export default function FirmwareUploader() {
     message: 'Ready to flash',
     progress: 0
   });
-  const [isBrowserSupported] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return 'serial' in navigator;
-  });
+  const [isBrowserSupported, setIsBrowserSupported] = useState(false);
+  const [mounted, setMounted] = useState(false);
   
   const [versions, setVersions] = useState<Version[]>([]);
   const [selectedVersion, setSelectedVersion] = useState<string>('');
   const [versionsLoading, setVersionsLoading] = useState(true);
+
+  // Check browser support after mount to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+    setIsBrowserSupported('serial' in navigator);
+  }, []);
   
   const portRef = useRef<SerialPort | null>(null);
   const transportRef = useRef<Transport | null>(null);
@@ -228,6 +232,20 @@ export default function FirmwareUploader() {
   const getSelectedVersionInfo = () => {
     return versions.find(v => v.version === selectedVersion);
   };
+
+  // Show loading state during SSR to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="w-full max-w-2xl mx-auto">
+        <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Flash Your StationBoard</h2>
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!isBrowserSupported) {
     return (
