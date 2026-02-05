@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useI18n } from '@/lib/i18n/I18nContext';
 import { ESPLoader, FlashOptions, LoaderOptions, Transport } from 'esptool-js';
 import { ChevronDown } from 'lucide-react';
 
@@ -38,6 +39,9 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
 }
 
 export default function FirmwareUploader() {
+  const { t } = useI18n();
+  const { uploader } = t;
+  
   const [progress, setProgress] = useState<FlashProgress>({
     stage: 'idle',
     message: 'Ready to flash',
@@ -49,15 +53,15 @@ export default function FirmwareUploader() {
   const [versions, setVersions] = useState<Version[]>([]);
   const [selectedVersion, setSelectedVersion] = useState<string>('');
   const [versionsLoading, setVersionsLoading] = useState(true);
+  
+  const portRef = useRef<SerialPort | null>(null);
+  const transportRef = useRef<Transport | null>(null);
 
   // Check browser support after mount to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
     setIsBrowserSupported('serial' in navigator);
   }, []);
-  
-  const portRef = useRef<SerialPort | null>(null);
-  const transportRef = useRef<Transport | null>(null);
 
   // Fetch available versions on mount
   useEffect(() => {
@@ -102,7 +106,7 @@ export default function FirmwareUploader() {
   };
 
   const fetchFirmwareFiles = async () => {
-    setProgress(prev => ({ ...prev, stage: 'downloading', message: 'Downloading firmware files...', progress: 0 }));
+    setProgress(prev => ({ ...prev, stage: 'downloading', message: uploader.button.downloading, progress: 0 }));
     
     try {
       const [bootloaderRes, partitionsRes, firmwareRes] = await Promise.all([
@@ -166,10 +170,15 @@ export default function FirmwareUploader() {
 
       const flashFiles = await fetchFirmwareFiles();
 
-      setProgress(prev => ({ ...prev, message: 'Flashing firmware...', progress: 30 }));
+      setProgress(prev => ({ ...prev, message: uploader.button.flashing, progress: 30 }));
+
+      const fileArray = flashFiles.map(f => ({ 
+        data: f.data, 
+        address: f.address 
+      }));
 
       const flashOptions: FlashOptions = {
-        fileArray: flashFiles,
+        fileArray,
         flashSize: 'keep',
         flashMode: 'dio',
         flashFreq: '40m',
@@ -182,7 +191,7 @@ export default function FirmwareUploader() {
           setProgress(prev => ({
             ...prev,
             progress: Math.min(90, totalProgress),
-            message: `Flashing part ${fileIndex + 1}/${flashFiles.length} (${Math.round(fileProgress)}%)...`
+            message: `${uploader.button.flashing} ${fileIndex + 1}/${flashFiles.length} (${Math.round(fileProgress)}%)...`
           }));
         }
       };
@@ -206,7 +215,7 @@ export default function FirmwareUploader() {
 
   const handleFlash = async () => {
     try {
-      setProgress({ stage: 'connecting', message: 'Waiting for USB device...', progress: 0 });
+      setProgress({ stage: 'connecting', message: uploader.button.connecting, progress: 0 });
       
       await requestPort();
       await flashDevice();
@@ -239,7 +248,7 @@ export default function FirmwareUploader() {
       <div className="w-full max-w-2xl mx-auto">
         <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Flash Your StationBoard</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">{uploader.title}</h2>
             <p className="text-gray-600">Loading...</p>
           </div>
         </div>
@@ -250,9 +259,9 @@ export default function FirmwareUploader() {
   if (!isBrowserSupported) {
     return (
       <div className="w-full max-w-2xl mx-auto p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <h3 className="text-lg font-semibold text-yellow-800 mb-2">Browser Not Supported</h3>
+        <h3 className="text-lg font-semibold text-yellow-800 mb-2">{uploader.browserNotSupported.title}</h3>
         <p className="text-yellow-700">
-          The Web Serial API is required to flash firmware. Please use Chrome, Edge, or Opera browser.
+          {uploader.browserNotSupported.message}
         </p>
       </div>
     );
@@ -262,9 +271,9 @@ export default function FirmwareUploader() {
     <div className="w-full max-w-2xl mx-auto">
       <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Flash Your StationBoard</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{uploader.title}</h2>
           <p className="text-gray-600">
-            Connect your ESP32-2432S028R via USB and click the button below to flash the firmware.
+            {uploader.subtitle}
           </p>
         </div>
 
@@ -272,7 +281,7 @@ export default function FirmwareUploader() {
           {/* Version Selector */}
           <div className="relative">
             <label htmlFor="version-select" className="block text-sm font-medium text-gray-700 mb-2">
-              Select Firmware Version
+              {uploader.selectVersion}
             </label>
             <div className="relative">
               <select
@@ -298,11 +307,11 @@ export default function FirmwareUploader() {
             </div>
             {getSelectedVersionInfo() && (
               <p className="mt-2 text-xs text-gray-500">
-                Released: {new Date(getSelectedVersionInfo()!.date).toLocaleDateString('en-US', {
+                {uploader.released.replace('{date}', new Date(getSelectedVersionInfo()!.date).toLocaleDateString(undefined, {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric'
-                })}
+                }))}
               </p>
             )}
           </div>
@@ -310,17 +319,17 @@ export default function FirmwareUploader() {
           <div className="flex items-center justify-center space-x-4 text-sm text-gray-600">
             <div className="flex items-center space-x-2">
               <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">1</span>
-              <span>Connect USB</span>
+              <span>{uploader.step1}</span>
             </div>
             <div className="w-8 h-px bg-gray-300"></div>
             <div className="flex items-center space-x-2">
               <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">2</span>
-              <span>Click Flash</span>
+              <span>{uploader.step2}</span>
             </div>
             <div className="w-8 h-px bg-gray-300"></div>
             <div className="flex items-center space-x-2">
               <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">3</span>
-              <span>Done!</span>
+              <span>{uploader.step3}</span>
             </div>
           </div>
 
@@ -337,13 +346,13 @@ export default function FirmwareUploader() {
                 : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg'
             }`}
           >
-            {progress.stage === 'idle' && `Flash v${selectedVersion || 'Latest'}`}
-            {progress.stage === 'connecting' && 'Connecting...'}
-            {progress.stage === 'downloading' && 'Downloading...'}
-            {progress.stage === 'flashing' && 'Flashing...'}
-            {progress.stage === 'verifying' && 'Verifying...'}
-            {progress.stage === 'complete' && 'Flash Complete - Flash Another'}
-            {progress.stage === 'error' && 'Try Again'}
+            {progress.stage === 'idle' && uploader.button.idle.replace('{version}', selectedVersion || 'Latest')}
+            {progress.stage === 'connecting' && uploader.button.connecting}
+            {progress.stage === 'downloading' && uploader.button.downloading}
+            {progress.stage === 'flashing' && uploader.button.flashing}
+            {progress.stage === 'verifying' && uploader.button.verifying}
+            {progress.stage === 'complete' && uploader.button.complete}
+            {progress.stage === 'error' && uploader.button.error}
           </button>
 
           {(progress.stage !== 'idle' || progress.message !== 'Ready to flash') && (
@@ -362,7 +371,7 @@ export default function FirmwareUploader() {
           )}
 
           <div className="text-xs text-gray-500 text-center space-y-1">
-            <p>ESP32-2432S028R (CYD) | Requires Chrome, Edge, or Opera</p>
+            <p>{uploader.deviceInfo}</p>
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useI18n } from '@/lib/i18n/I18nContext';
 import { Download, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Version {
@@ -19,6 +20,9 @@ interface VersionsData {
 }
 
 export default function VersionNotes() {
+  const { t } = useI18n();
+  const { versions: versionsT } = t;
+  
   const [versions, setVersions] = useState<Version[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +53,7 @@ export default function VersionNotes() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString(undefined, {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -84,12 +88,12 @@ export default function VersionNotes() {
   }
 
   return (
-    <section className="w-full py-16 bg-white">
+    <section className="w-full py-16 bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Version History</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">{versionsT.title}</h2>
           <p className="text-gray-600">
-            Latest firmware updates and improvements for your StationBoard
+            {versionsT.subtitle}
           </p>
         </div>
 
@@ -133,7 +137,7 @@ export default function VersionNotes() {
                     className="flex items-center space-x-1 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 transition-colors"
                   >
                     <Download className="w-4 h-4" />
-                    <span>.bin</span>
+                    <span>{versionsT.download}</span>
                   </a>
                   {expandedVersion === version.version ? (
                     <ChevronUp className="w-5 h-5 text-gray-400" />
@@ -145,7 +149,7 @@ export default function VersionNotes() {
 
               {expandedVersion === version.version && (
                 <div className="px-6 pb-4 border-t border-gray-200 pt-4">
-                  <h4 className="text-sm font-semibold text-gray-900 mb-2">Changes:</h4>
+                  <h4 className="text-sm font-semibold text-gray-900 mb-2">{versionsT.changes}</h4>
                   <ul className="space-y-2">
                     {version.changes.map((change, changeIndex) => (
                       <li
@@ -163,9 +167,9 @@ export default function VersionNotes() {
           ))}
         </div>
 
-        <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="mt-8 p-4 bg-white rounded-lg border border-gray-200">
           <p className="text-sm text-gray-600 text-center">
-            <strong>Note:</strong> Use the uploader above for automatic flashing, or download the .bin file for manual flashing with esptool.py or ESP Flash Download Tools.
+            {versionsT.note}
           </p>
         </div>
       </div>
