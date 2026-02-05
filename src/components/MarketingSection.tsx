@@ -53,6 +53,23 @@ export default function MarketingSection() {
           </p>
         </div>
 
+        {/* Features Grid */}
+        <div className="mb-16">
+          <h3 className="text-2xl font-bold text-center text-gray-900 mb-8">{marketing.features.title}</h3>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map((feature, index) => (
+              <div 
+                key={index}
+                className="bg-gray-50 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100"
+              >
+                <feature.icon className="w-10 h-10 text-blue-600 mb-4" />
+                <h4 className="font-semibold text-gray-900 mb-2">{feature.title}</h4>
+                <p className="text-gray-600 text-sm">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* How it works */}
         <div className="bg-gray-50 rounded-2xl shadow-lg p-8 mb-16">
           <h3 className="text-2xl font-bold text-center text-gray-900 mb-8">{marketing.howItWorks.title}</h3>
@@ -78,23 +95,6 @@ export default function MarketingSection() {
               <h4 className="font-semibold text-gray-900 mb-2">{marketing.howItWorks.step3.title}</h4>
               <p className="text-gray-600 text-sm">{marketing.howItWorks.step3.description}</p>
             </div>
-          </div>
-        </div>
-
-        {/* Features Grid */}
-        <div className="mb-16">
-          <h3 className="text-2xl font-bold text-center text-gray-900 mb-8">{marketing.features.title}</h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
-              <div 
-                key={index}
-                className="bg-gray-50 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100"
-              >
-                <feature.icon className="w-10 h-10 text-blue-600 mb-4" />
-                <h4 className="font-semibold text-gray-900 mb-2">{feature.title}</h4>
-                <p className="text-gray-600 text-sm">{feature.description}</p>
-              </div>
-            ))}
           </div>
         </div>
 
