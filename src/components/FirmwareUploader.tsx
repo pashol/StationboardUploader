@@ -289,7 +289,7 @@ export default function FirmwareUploader() {
                 value={selectedVersion}
                 onChange={(e) => setSelectedVersion(e.target.value)}
                 disabled={versionsLoading || progress.stage !== 'idle'}
-                className="block w-full pl-4 pr-10 py-3 text-base border-neutral-silver focus:outline-none focus:ring-sbb-red focus:border-sbb-red sm:text-sm rounded-lg border bg-neutral-white disabled:bg-neutral-milk disabled:text-neutral-smoke appearance-none cursor-pointer"
+                className="block w-full pl-4 pr-10 py-3 text-base border-neutral-silver focus:outline-none focus:ring-sbb-red focus:border-sbb-red sm:text-sm rounded-lg border bg-neutral-white text-neutral-iron disabled:bg-neutral-milk disabled:text-neutral-smoke appearance-none cursor-pointer"
               >
                 {versionsLoading ? (
                   <option>Loading versions...</option>
