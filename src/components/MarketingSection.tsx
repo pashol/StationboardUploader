@@ -58,13 +58,13 @@ export default function MarketingSection() {
           <h3 className="text-2xl font-bold text-center text-neutral-charcoal mb-8">{marketing.features.title}</h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
-              <div 
+              <div
                 key={index}
-                className="bg-neutral-milk rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border border-neutral-cloud"
+                className="bg-sbb-red rounded-xl p-6 shadow-sm hover:shadow-lg hover:bg-sbb-red125 transition-all border border-sbb-red150"
               >
-                <feature.icon className="w-10 h-10 text-accent-blue mb-4" />
-                <h4 className="font-semibold text-neutral-charcoal mb-2">{feature.title}</h4>
-                <p className="text-neutral-metal text-sm">{feature.description}</p>
+                <feature.icon className="w-10 h-10 text-neutral-white mb-4" />
+                <h4 className="font-semibold text-neutral-white mb-2">{feature.title}</h4>
+                <p className="text-neutral-white/90 text-sm">{feature.description}</p>
               </div>
             ))}
           </div>
