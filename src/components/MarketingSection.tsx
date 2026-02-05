@@ -66,7 +66,7 @@ export default function MarketingSection() {
                 <span className="text-2xl font-bold text-blue-600">2</span>
               </div>
               <h4 className="font-semibold text-gray-900 mb-2">Configure WiFi</h4>
-              <p className="text-gray-600 text-sm">Connect to the "Stationboard-AP" network and set up your stations</p>
+              <p className="text-gray-600 text-sm">Connect to the &quot;Stationboard-AP&quot; network and set up your stations</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -118,10 +118,10 @@ export default function MarketingSection() {
           <h3 className="text-2xl font-bold text-gray-900 mb-4">Hardware Requirements</h3>
           <div className="bg-white rounded-xl shadow-sm p-6 inline-block">
             <p className="text-gray-700 mb-2">
-              <strong>ESP32-2432S028R</strong> (CYD - "Cheap Yellow Display")
+              <strong>ESP32-2432S028R</strong> (CYD - &quot;Cheap Yellow Display&quot;)
             </p>
             <ul className="text-gray-600 text-sm space-y-1">
-              <li>ESP32 with integrated 2.8" ILI9341 TFT display (320x240)</li>
+              <li>ESP32 with integrated 2.8&quot; ILI9341 TFT display (320x240)</li>
               <li>Built-in boot button for controls</li>
               <li>USB power supply (5V)</li>
               <li>2.4 GHz WiFi network</li>

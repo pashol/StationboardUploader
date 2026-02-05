@@ -11,6 +11,16 @@ interface FlashProgress {
 
 const SERIAL_BAUDRATE = 921600;
 
+// Convert ArrayBuffer to base64 string
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
 export default function FirmwareUploader() {
   const [progress, setProgress] = useState<FlashProgress>({
     stage: 'idle',
@@ -64,9 +74,9 @@ export default function FirmwareUploader() {
       setProgress(prev => ({ ...prev, progress: 100 }));
       
       return [
-        { data: bootloader, address: 0x1000 },
-        { data: partitions, address: 0x8000 },
-        { data: firmware, address: 0x10000 }
+        { data: arrayBufferToBase64(bootloader), address: 0x1000 },
+        { data: arrayBufferToBase64(partitions), address: 0x8000 },
+        { data: arrayBufferToBase64(firmware), address: 0x10000 }
       ];
     } catch (err) {
       throw new Error('Failed to download firmware files: ' + (err as Error).message);
@@ -89,6 +99,7 @@ export default function FirmwareUploader() {
       const loaderOptions: LoaderOptions = {
         transport,
         baudrate: SERIAL_BAUDRATE,
+        romBaudrate: SERIAL_BAUDRATE,
         terminal: {
           clean: () => {},
           writeLine: (data: string) => console.log('[ESP]', data),
@@ -109,14 +120,11 @@ export default function FirmwareUploader() {
 
       setProgress(prev => ({ ...prev, message: 'Flashing firmware...', progress: 30 }));
 
-      const fileArray = flashFiles.map(f => ({ 
-        data: new Uint8Array(f.data), 
-        address: f.address 
-      }));
-
       const flashOptions: FlashOptions = {
-        fileArray,
+        fileArray: flashFiles,
         flashSize: 'keep',
+        flashMode: 'dio',
+        flashFreq: '40m',
         eraseAll: false,
         compress: true,
         reportProgress: (fileIndex: number, written: number, total: number) => {
