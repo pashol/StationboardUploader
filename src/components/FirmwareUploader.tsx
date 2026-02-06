@@ -148,7 +148,7 @@ export default function FirmwareUploader() {
         try {
           await portRef.current.close();
         } catch (e) {
-          console.log('Port was not open or already closing');
+          console.log('Port was not open or already closing:', e);
         }
       }
 
