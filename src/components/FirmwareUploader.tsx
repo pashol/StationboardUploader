@@ -143,29 +143,20 @@ export default function FirmwareUploader() {
     setProgress({ stage: 'flashing', message: 'Connecting to device...', progress: 0 });
 
     try {
-      // Always try to close port first to ensure clean state
-      try {
-        await portRef.current.close();
-        console.log('Port closed successfully');
-        // Wait a bit for port to fully close
-        await new Promise(resolve => setTimeout(resolve, 100));
-      } catch (e) {
-        console.log('Port close attempt (may not have been open):', e);
-      }
-
-      // Try to open port, retry once if it fails
-      try {
-        await portRef.current.open({ baudRate: SERIAL_BAUDRATE });
-      } catch (openError) {
-        console.log('First open attempt failed, retrying after cleanup...', openError);
-        // Try closing again and wait longer
+      // Ensure clean port state
+      if (portRef.current.readable || portRef.current.writable) {
+        // Port is already open - close it before reopening
         try {
           await portRef.current.close();
-          await new Promise(resolve => setTimeout(resolve, 300));
+          console.log('Port closed successfully');
+          await new Promise(resolve => setTimeout(resolve, 200));
         } catch (e) {
-          console.log('Retry close:', e);
+          console.log('Port close failed, will try to use as-is:', e);
         }
-        // Retry open
+      }
+
+      // Only open if port is not currently open
+      if (!portRef.current.readable && !portRef.current.writable) {
         await portRef.current.open({ baudRate: SERIAL_BAUDRATE });
       }
       
