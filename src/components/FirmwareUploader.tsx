@@ -143,7 +143,31 @@ export default function FirmwareUploader() {
     setProgress({ stage: 'flashing', message: 'Connecting to device...', progress: 0 });
 
     try {
-      await portRef.current.open({ baudRate: SERIAL_BAUDRATE });
+      // Always try to close port first to ensure clean state
+      try {
+        await portRef.current.close();
+        console.log('Port closed successfully');
+        // Wait a bit for port to fully close
+        await new Promise(resolve => setTimeout(resolve, 100));
+      } catch (e) {
+        console.log('Port close attempt (may not have been open):', e);
+      }
+
+      // Try to open port, retry once if it fails
+      try {
+        await portRef.current.open({ baudRate: SERIAL_BAUDRATE });
+      } catch (openError) {
+        console.log('First open attempt failed, retrying after cleanup...', openError);
+        // Try closing again and wait longer
+        try {
+          await portRef.current.close();
+          await new Promise(resolve => setTimeout(resolve, 300));
+        } catch (e) {
+          console.log('Retry close:', e);
+        }
+        // Retry open
+        await portRef.current.open({ baudRate: SERIAL_BAUDRATE });
+      }
       
       const transport = new Transport(portRef.current);
       transportRef.current = transport;
@@ -155,7 +179,7 @@ export default function FirmwareUploader() {
         terminal: {
           clean: () => {},
           writeLine: (data: string) => console.log('[ESP]', data),
-          write: (data: string) => process.stdout.write(data)
+          write: (data: string) => console.log(data)
         }
       };
 
@@ -206,9 +230,27 @@ export default function FirmwareUploader() {
       await transport.setDTR(true);
 
       await transport.disconnect();
-      
+
     } catch (err) {
       console.error('Flash error:', err);
+
+      // Clean up port and transport on error
+      try {
+        if (transportRef.current) {
+          await transportRef.current.disconnect();
+        }
+      } catch (e) {
+        console.log('Transport cleanup failed:', e);
+      }
+
+      try {
+        if (portRef.current && (portRef.current.readable || portRef.current.writable)) {
+          await portRef.current.close();
+        }
+      } catch (e) {
+        console.log('Port cleanup failed:', e);
+      }
+
       throw err;
     }
   };

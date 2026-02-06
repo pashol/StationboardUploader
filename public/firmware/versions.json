@@ -1,6 +1,20 @@
 {
   "versions": [
     {
+      "version": "1.2.1",
+      "date": "2026-01-29",
+      "changes": [
+        "Fix night mode refresh after temporary wake or exit",
+        "Restore brightness behavior on wake in night mode",
+        "Avoid sleeping immediately after temporary night wake"
+      ],
+      "files": {
+        "bootloader": "bootloader.bin",
+        "partitions": "partitions.bin",
+        "firmware": "firmware.bin"
+      }
+    },
+    {
       "version": "1.2.0",
       "date": "2025-01-30",
       "changes": [
