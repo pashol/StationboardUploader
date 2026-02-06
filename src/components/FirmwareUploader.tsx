@@ -143,6 +143,15 @@ export default function FirmwareUploader() {
     setProgress({ stage: 'flashing', message: 'Connecting to device...', progress: 0 });
 
     try {
+      // Close port if already open
+      if (portRef.current.readable || portRef.current.writable) {
+        try {
+          await portRef.current.close();
+        } catch (e) {
+          console.log('Port was not open or already closing');
+        }
+      }
+
       await portRef.current.open({ baudRate: SERIAL_BAUDRATE });
       
       const transport = new Transport(portRef.current);
@@ -206,9 +215,27 @@ export default function FirmwareUploader() {
       await transport.setDTR(true);
 
       await transport.disconnect();
-      
+
     } catch (err) {
       console.error('Flash error:', err);
+
+      // Clean up port and transport on error
+      try {
+        if (transportRef.current) {
+          await transportRef.current.disconnect();
+        }
+      } catch (e) {
+        console.log('Transport cleanup failed:', e);
+      }
+
+      try {
+        if (portRef.current && (portRef.current.readable || portRef.current.writable)) {
+          await portRef.current.close();
+        }
+      } catch (e) {
+        console.log('Port cleanup failed:', e);
+      }
+
       throw err;
     }
   };
