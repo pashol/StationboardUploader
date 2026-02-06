@@ -155,7 +155,7 @@ export default function FirmwareUploader() {
         terminal: {
           clean: () => {},
           writeLine: (data: string) => console.log('[ESP]', data),
-          write: (data: string) => process.stdout.write(data)
+          write: (data: string) => console.log(data)
         }
       };
 
