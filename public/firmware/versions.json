@@ -9,9 +9,9 @@
         "Avoid sleeping immediately after temporary night wake"
       ],
       "files": {
-        "bootloader": "bootloader.bin",
-        "partitions": "partitions.bin",
-        "firmware": "firmware.bin"
+        "bootloader": "stationboard-v1.2.1-bootloader.bin",
+        "partitions": "stationboard-v1.2.1-partitions.bin",
+        "firmware": "stationboard-v1.2.1-firmware.bin"
       }
     },
     {
@@ -22,9 +22,9 @@
         "Fixed sprite memory issues for smoother display"
       ],
       "files": {
-        "bootloader": "bootloader.bin",
-        "partitions": "partitions.bin",
-        "firmware": "firmware.bin"
+        "bootloader": "stationboard-v1.2.0-bootloader.bin",
+        "partitions": "stationboard-v1.2.0-partitions.bin",
+        "firmware": "stationboard-v1.2.0-firmware.bin"
       }
     },
     {
@@ -35,9 +35,9 @@
         "Improved power saving modes"
       ],
       "files": {
-        "bootloader": "bootloader.bin",
-        "partitions": "partitions.bin",
-        "firmware": "firmware.bin"
+        "bootloader": "stationboard-v1.1.0-bootloader.bin",
+        "partitions": "stationboard-v1.1.0-partitions.bin",
+        "firmware": "stationboard-v1.1.0-firmware.bin"
       }
     },
     {
@@ -48,9 +48,9 @@
         "WiFi configuration portal"
       ],
       "files": {
-        "bootloader": "bootloader.bin",
-        "partitions": "partitions.bin",
-        "firmware": "firmware.bin"
+        "bootloader": "stationboard-v1.0.0-bootloader.bin",
+        "partitions": "stationboard-v1.0.0-partitions.bin",
+        "firmware": "stationboard-v1.0.0-firmware.bin"
       }
     }
   ]
