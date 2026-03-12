@@ -129,12 +129,14 @@ Example `versions.json`:
       "version": "1.2.1",
       "date": "2026-01-29",
       "changes": [
-        "Fix night mode refresh after temporary wake or exit"
+        "Fix night mode refresh after temporary wake or exit",
+        "Restore brightness behavior on wake in night mode",
+        "Avoid sleeping immediately after temporary night wake"
       ],
       "files": {
-        "bootloader": "bootloader.bin",
-        "partitions": "partitions.bin",
-        "firmware": "firmware.bin"
+        "bootloader": "stationboard-v1.2.1-bootloader.bin",
+        "partitions": "stationboard-v1.2.1-partitions.bin",
+        "firmware": "stationboard-v1.2.1-firmware.bin"
       }
     }
   ]
