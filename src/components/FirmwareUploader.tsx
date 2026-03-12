@@ -88,6 +88,10 @@ export default function FirmwareUploader() {
   }, []);
 
   const requestPort = async () => {
+    // Reuse the existing port if it is stored and fully closed
+    if (portRef.current && !portRef.current.readable && !portRef.current.writable) {
+      return portRef.current;
+    }
     try {
       const port = await navigator.serial.requestPort({
         filters: [
@@ -105,14 +109,36 @@ export default function FirmwareUploader() {
     }
   };
 
-  const fetchFirmwareFiles = async () => {
+  // Disconnect transport first (releases stream locks), then close the port.
+  // This order is required: SerialPort.close() throws "stream is locked" if
+  // the Transport's reader/writer are not released beforehand.
+  const cleanupPort = async () => {
+    if (transportRef.current) {
+      try {
+        await transportRef.current.disconnect();
+      } catch (e) {
+        console.warn('Transport disconnect failed during cleanup:', e);
+      }
+      transportRef.current = null;
+    }
+    if (portRef.current && (portRef.current.readable || portRef.current.writable)) {
+      try {
+        await portRef.current.close();
+      } catch (e) {
+        console.warn('Port close failed during cleanup:', e);
+      }
+    }
+  };
+
+  const fetchFirmwareFiles = async (version: Version) => {
     setProgress(prev => ({ ...prev, stage: 'downloading', message: uploader.button.downloading, progress: 0 }));
-    
+
+    const base = `/firmware/${version.version}`;
     try {
       const [bootloaderRes, partitionsRes, firmwareRes] = await Promise.all([
-        fetch('/firmware/bootloader.bin'),
-        fetch('/firmware/partitions.bin'),
-        fetch('/firmware/firmware.bin')
+        fetch(`${base}/${version.files.bootloader}`),
+        fetch(`${base}/${version.files.partitions}`),
+        fetch(`${base}/${version.files.firmware}`)
       ]);
 
       if (!bootloaderRes.ok || !partitionsRes.ok || !firmwareRes.ok) {
@@ -135,7 +161,7 @@ export default function FirmwareUploader() {
     }
   };
 
-  const flashDevice = async () => {
+  const flashDevice = async (version: Version) => {
     if (!portRef.current) {
       throw new Error('No USB device connected');
     }
@@ -143,30 +169,29 @@ export default function FirmwareUploader() {
     setProgress({ stage: 'flashing', message: 'Connecting to device...', progress: 0 });
 
     try {
-      // Ensure clean port state
+      // Ensure port is fully closed before opening. cleanupPort() disconnects
+      // the Transport first to release stream locks, then closes the port.
       if (portRef.current.readable || portRef.current.writable) {
-        // Port is already open - close it before reopening
-        try {
-          await portRef.current.close();
-          console.log('Port closed successfully');
-          await new Promise(resolve => setTimeout(resolve, 200));
-        } catch (e) {
-          console.log('Port close failed, will try to use as-is:', e);
-        }
+        await cleanupPort();
+        await new Promise(resolve => setTimeout(resolve, 200)); // USB CDC ACM settling
       }
 
-      // Only open if port is not currently open
-      if (!portRef.current.readable && !portRef.current.writable) {
-        await portRef.current.open({ baudRate: SERIAL_BAUDRATE });
+      // If the port is still open after cleanup, something external is holding
+      // a lock — surface a clear error rather than failing inside esptool-js.
+      if (portRef.current.readable || portRef.current.writable) {
+        throw new Error('Could not close the serial port. Please unplug and replug the device.');
       }
-      
+
+      // Do NOT call port.open() here — Transport.connect() (called internally
+      // by esploader.main()) opens the port itself. Opening it here too causes
+      // "The port is already open" on the Transport's connect call.
       const transport = new Transport(portRef.current);
       transportRef.current = transport;
       
       const loaderOptions: LoaderOptions = {
         transport,
         baudrate: SERIAL_BAUDRATE,
-        romBaudrate: SERIAL_BAUDRATE,
+        romBaudrate: 115200,
         terminal: {
           clean: () => {},
           writeLine: (data: string) => console.log('[ESP]', data),
@@ -183,7 +208,7 @@ export default function FirmwareUploader() {
 
       setProgress(prev => ({ ...prev, message: 'Preparing flash...', progress: 20 }));
 
-      const flashFiles = await fetchFirmwareFiles();
+      const flashFiles = await fetchFirmwareFiles(version);
 
       setProgress(prev => ({ ...prev, message: uploader.button.flashing, progress: 30 }));
 
@@ -215,43 +240,35 @@ export default function FirmwareUploader() {
 
       setProgress({ stage: 'complete', message: 'Flash complete! Device restarting...', progress: 100 });
 
-      // Reset the device
-      await transport.setDTR(false);
+      // Hard reset via RTS (RTS→EN, DTR→GPIO0 on CH340/CYD boards).
+      // Assert reset with GPIO0 HIGH so the chip boots normally (not download mode).
+      await transport.setRTS(true);   // EN LOW  → hold in reset
+      await transport.setDTR(false);  // GPIO0 HIGH → normal boot mode
       await new Promise(resolve => setTimeout(resolve, 100));
-      await transport.setDTR(true);
+      await transport.setRTS(false);  // EN HIGH → release reset, chip boots
 
-      await transport.disconnect();
+      // Close the port so it is in a clean state for any subsequent flash attempt
+      await cleanupPort();
 
     } catch (err) {
       console.error('Flash error:', err);
-
-      // Clean up port and transport on error
-      try {
-        if (transportRef.current) {
-          await transportRef.current.disconnect();
-        }
-      } catch (e) {
-        console.log('Transport cleanup failed:', e);
-      }
-
-      try {
-        if (portRef.current && (portRef.current.readable || portRef.current.writable)) {
-          await portRef.current.close();
-        }
-      } catch (e) {
-        console.log('Port cleanup failed:', e);
-      }
-
+      await cleanupPort();
       throw err;
     }
   };
 
   const handleFlash = async () => {
+    const version = versions.find(v => v.version === selectedVersion);
+    if (!version) {
+      setProgress({ stage: 'error', message: 'No firmware version selected', progress: 0 });
+      return;
+    }
+
     try {
       setProgress({ stage: 'connecting', message: uploader.button.connecting, progress: 0 });
-      
+
       await requestPort();
-      await flashDevice();
+      await flashDevice(version);
       
     } catch (err) {
       setProgress({
