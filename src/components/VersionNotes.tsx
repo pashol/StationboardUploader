@@ -156,20 +156,16 @@ export default function VersionNotes() {
                     <h4 className="text-sm font-semibold text-neutral-charcoal mb-2">{versionsT.downloadFiles}</h4>
                     <div className="flex flex-wrap gap-2">
                       {(
-                        [
-                          { key: 'bootloader', label: versionsT.downloadBootloader },
-                          { key: 'partitions', label: versionsT.downloadPartitions },
-                          { key: 'firmware', label: versionsT.downloadFirmware },
-                        ] as { key: keyof typeof version.files; label: string }[]
-                      ).map(({ key, label }) => (
+                        ['bootloader', 'partitions', 'firmware'] as (keyof typeof version.files)[]
+                      ).map((key) => (
                         <a
                           key={key}
                           href={`/firmware/${version.version}/${version.files[key]}`}
-                          download={`stationboard-v${version.version}-${key}.bin`}
+                          download={version.files[key]}
                           className="flex items-center space-x-1 px-3 py-1.5 text-sm font-medium text-neutral-granite bg-neutral-white border border-neutral-silver rounded-lg hover:bg-neutral-milk hover:text-neutral-charcoal transition-colors"
                         >
                           <Download className="w-4 h-4" />
-                          <span>{label}</span>
+                          <span>{version.files[key]}</span>
                         </a>
                       ))}
                     </div>
