@@ -190,7 +190,7 @@ export default function FirmwareUploader() {
       const loaderOptions: LoaderOptions = {
         transport,
         baudrate: SERIAL_BAUDRATE,
-        romBaudrate: SERIAL_BAUDRATE,
+        romBaudrate: 115200,
         terminal: {
           clean: () => {},
           writeLine: (data: string) => console.log('[ESP]', data),
