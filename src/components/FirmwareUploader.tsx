@@ -239,10 +239,12 @@ export default function FirmwareUploader() {
 
       setProgress({ stage: 'complete', message: 'Flash complete! Device restarting...', progress: 100 });
 
-      // Reset the device before releasing the port
-      await transport.setDTR(false);
+      // Hard reset via RTS (RTS→EN, DTR→GPIO0 on CH340/CYD boards).
+      // Assert reset with GPIO0 HIGH so the chip boots normally (not download mode).
+      await transport.setRTS(true);   // EN LOW  → hold in reset
+      await transport.setDTR(false);  // GPIO0 HIGH → normal boot mode
       await new Promise(resolve => setTimeout(resolve, 100));
-      await transport.setDTR(true);
+      await transport.setRTS(false);  // EN HIGH → release reset, chip boots
 
       // Close the port so it is in a clean state for any subsequent flash attempt
       await cleanupPort();
