@@ -130,15 +130,6 @@ export default function VersionNotes() {
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <a
-                    href="/firmware/firmware.bin"
-                    download={`stationboard-v${version.version}.bin`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="flex items-center space-x-1 px-3 py-1.5 text-sm font-medium text-neutral-granite bg-neutral-white border border-neutral-silver rounded-lg hover:bg-neutral-milk hover:text-neutral-charcoal transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                    <span>{versionsT.download}</span>
-                  </a>
                   {expandedVersion === version.version ? (
                     <ChevronUp className="w-5 h-5 text-neutral-smoke" />
                   ) : (
@@ -161,6 +152,28 @@ export default function VersionNotes() {
                       </li>
                     ))}
                   </ul>
+                  <div className="mt-4 pt-4 border-t border-neutral-cloud">
+                    <h4 className="text-sm font-semibold text-neutral-charcoal mb-2">{versionsT.downloadFiles}</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {(
+                        [
+                          { key: 'bootloader', label: versionsT.downloadBootloader },
+                          { key: 'partitions', label: versionsT.downloadPartitions },
+                          { key: 'firmware', label: versionsT.downloadFirmware },
+                        ] as { key: keyof typeof version.files; label: string }[]
+                      ).map(({ key, label }) => (
+                        <a
+                          key={key}
+                          href={`/firmware/${version.version}/${version.files[key]}`}
+                          download={`stationboard-v${version.version}-${key}.bin`}
+                          className="flex items-center space-x-1 px-3 py-1.5 text-sm font-medium text-neutral-granite bg-neutral-white border border-neutral-silver rounded-lg hover:bg-neutral-milk hover:text-neutral-charcoal transition-colors"
+                        >
+                          <Download className="w-4 h-4" />
+                          <span>{label}</span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

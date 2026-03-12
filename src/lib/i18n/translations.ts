@@ -99,8 +99,11 @@ export const translations = {
       title: 'Version History',
       subtitle: 'Latest firmware updates and improvements for your StationBoard',
       changes: 'Changes:',
-      note: 'Note: Use the uploader above for automatic flashing, or download the .bin file for manual flashing with esptool.py or ESP Flash Download Tools.',
-      download: '.bin'
+      note: 'Note: Use the uploader above for automatic flashing, or download all three files below for manual flashing with esptool.py or ESP Flash Download Tools.',
+      downloadFiles: 'Download files',
+      downloadBootloader: 'bootloader.bin',
+      downloadPartitions: 'partitions.bin',
+      downloadFirmware: 'firmware.bin'
     },
     footer: {
       title: 'StationBoard',
@@ -210,8 +213,11 @@ export const translations = {
       title: 'Versionsverlauf',
       subtitle: 'Neueste Firmware-Updates und Verbesserungen für Ihr StationBoard',
       changes: 'Änderungen:',
-      note: 'Hinweis: Verwenden Sie den Uploader oben für automatisches Flashen, oder laden Sie die .bin-Datei für manuelles Flashen mit esptool.py oder ESP Flash Download Tools herunter.',
-      download: '.bin'
+      note: 'Hinweis: Verwenden Sie den Uploader oben für automatisches Flashen, oder laden Sie alle drei Dateien unten für manuelles Flashen mit esptool.py oder ESP Flash Download Tools herunter.',
+      downloadFiles: 'Dateien herunterladen',
+      downloadBootloader: 'bootloader.bin',
+      downloadPartitions: 'partitions.bin',
+      downloadFirmware: 'firmware.bin'
     },
     footer: {
       title: 'StationBoard',
@@ -321,8 +327,11 @@ export const translations = {
       title: 'Historique des versions',
       subtitle: 'Dernières mises à jour et améliorations du firmware pour votre StationBoard',
       changes: 'Modifications :',
-      note: 'Note : Utilisez l\'uploader ci-dessus pour le flashage automatique, ou téléchargez le fichier .bin pour le flashage manuel avec esptool.py ou ESP Flash Download Tools.',
-      download: '.bin'
+      note: 'Note : Utilisez l\'uploader ci-dessus pour le flashage automatique, ou téléchargez les trois fichiers ci-dessous pour le flashage manuel avec esptool.py ou ESP Flash Download Tools.',
+      downloadFiles: 'Télécharger les fichiers',
+      downloadBootloader: 'bootloader.bin',
+      downloadPartitions: 'partitions.bin',
+      downloadFirmware: 'firmware.bin'
     },
     footer: {
       title: 'StationBoard',
@@ -432,8 +441,11 @@ export const translations = {
       title: 'Cronologia versioni',
       subtitle: 'Ultimi aggiornamenti firmware e miglioramenti per il tuo StationBoard',
       changes: 'Modifiche:',
-      note: 'Nota: Usa l\'uploader sopra per il flash automatico, o scarica il file .bin per il flash manuale con esptool.py o ESP Flash Download Tools.',
-      download: '.bin'
+      note: 'Nota: Usa l\'uploader sopra per il flash automatico, o scarica tutti e tre i file qui sotto per il flash manuale con esptool.py o ESP Flash Download Tools.',
+      downloadFiles: 'Scarica i file',
+      downloadBootloader: 'bootloader.bin',
+      downloadPartitions: 'partitions.bin',
+      downloadFirmware: 'firmware.bin'
     },
     footer: {
       title: 'StationBoard',
