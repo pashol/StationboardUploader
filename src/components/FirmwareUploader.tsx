@@ -130,14 +130,15 @@ export default function FirmwareUploader() {
     }
   };
 
-  const fetchFirmwareFiles = async () => {
+  const fetchFirmwareFiles = async (version: Version) => {
     setProgress(prev => ({ ...prev, stage: 'downloading', message: uploader.button.downloading, progress: 0 }));
-    
+
+    const base = `/firmware/${version.version}`;
     try {
       const [bootloaderRes, partitionsRes, firmwareRes] = await Promise.all([
-        fetch('/firmware/bootloader.bin'),
-        fetch('/firmware/partitions.bin'),
-        fetch('/firmware/firmware.bin')
+        fetch(`${base}/${version.files.bootloader}`),
+        fetch(`${base}/${version.files.partitions}`),
+        fetch(`${base}/${version.files.firmware}`)
       ]);
 
       if (!bootloaderRes.ok || !partitionsRes.ok || !firmwareRes.ok) {
@@ -160,7 +161,7 @@ export default function FirmwareUploader() {
     }
   };
 
-  const flashDevice = async () => {
+  const flashDevice = async (version: Version) => {
     if (!portRef.current) {
       throw new Error('No USB device connected');
     }
@@ -207,7 +208,7 @@ export default function FirmwareUploader() {
 
       setProgress(prev => ({ ...prev, message: 'Preparing flash...', progress: 20 }));
 
-      const flashFiles = await fetchFirmwareFiles();
+      const flashFiles = await fetchFirmwareFiles(version);
 
       setProgress(prev => ({ ...prev, message: uploader.button.flashing, progress: 30 }));
 
@@ -257,11 +258,17 @@ export default function FirmwareUploader() {
   };
 
   const handleFlash = async () => {
+    const version = versions.find(v => v.version === selectedVersion);
+    if (!version) {
+      setProgress({ stage: 'error', message: 'No firmware version selected', progress: 0 });
+      return;
+    }
+
     try {
       setProgress({ stage: 'connecting', message: uploader.button.connecting, progress: 0 });
-      
+
       await requestPort();
-      await flashDevice();
+      await flashDevice(version);
       
     } catch (err) {
       setProgress({
