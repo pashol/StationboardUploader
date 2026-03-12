@@ -28,14 +28,14 @@ interface VersionsData {
 
 const SERIAL_BAUDRATE = 921600;
 
-// Convert ArrayBuffer to base64 string
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
+// Convert ArrayBuffer to binary string (esptool-js expects raw binary, not base64)
+function arrayBufferToBinaryString(buffer: ArrayBuffer): string {
   const bytes = new Uint8Array(buffer);
   let binary = '';
   for (let i = 0; i < bytes.byteLength; i++) {
     binary += String.fromCharCode(bytes[i]);
   }
-  return btoa(binary);
+  return binary;
 }
 
 export default function FirmwareUploader() {
@@ -152,9 +152,9 @@ export default function FirmwareUploader() {
       setProgress(prev => ({ ...prev, progress: 100 }));
       
       return [
-        { data: arrayBufferToBase64(bootloader), address: 0x1000 },
-        { data: arrayBufferToBase64(partitions), address: 0x8000 },
-        { data: arrayBufferToBase64(firmware), address: 0x10000 }
+        { data: arrayBufferToBinaryString(bootloader), address: 0x1000 },
+        { data: arrayBufferToBinaryString(partitions), address: 0x8000 },
+        { data: arrayBufferToBinaryString(firmware), address: 0x10000 }
       ];
     } catch (err) {
       throw new Error('Failed to download firmware files: ' + (err as Error).message);
