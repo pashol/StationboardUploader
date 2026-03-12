@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Next.js 14 web application for flashing ESP32 firmware. Web-based firmware uploader for StationBoard Swiss transport display devices.
+Next.js 14 web application for flashing ESP32 firmware. Web-based firmware uploader for StationBoard Swiss transport display devices. Uses the Web Serial API and esptool-js to flash firmware directly from the browser, with no software installation required.
 
 ## Build Commands
 
@@ -69,7 +69,6 @@ import { ESPLoader } from 'esptool-js';
 import { ChevronDown } from 'lucide-react';
 
 import { useI18n } from '@/lib/i18n/I18nContext';
-import { formatDate } from '@/lib/utils';
 ```
 
 ### Naming Conventions
@@ -80,7 +79,7 @@ import { formatDate } from '@/lib/utils';
 - **Constants**: UPPER_SNAKE_CASE for true constants (e.g., `SERIAL_BAUDRATE`)
 - **Interfaces/Types**: PascalCase with descriptive names
 - **Files**: kebab-case for utilities (e.g., `translations.ts`), PascalCase for components
-- **CSS classes**: Tailwind utility classes, no custom CSS unless necessary
+- **CSS classes**: Tailwind utility classes with SBB color tokens; no custom CSS unless necessary
 
 ### Error Handling
 
@@ -93,16 +92,20 @@ import { formatDate } from '@/lib/utils';
 
 - **useState** for component state
 - **useEffect** for side effects (fetching data, subscriptions)
-- **useRef** for DOM references and mutable values
+- **useRef** for DOM references and mutable values (e.g., `portRef`, `transportRef`)
 - **useCallback** for memoized callbacks (when needed)
 - **Custom hooks** extracted to `@/lib/hooks/` when reused
 
 ### Styling
 
 - **Tailwind CSS** for all styling
+- **SBB color palette** — use the semantic tokens defined in `tailwind.config.ts`:
+  - Primary action: `bg-sbb-red`, `hover:bg-sbb-red125`
+  - Text: `text-neutral-charcoal`, `text-neutral-metal`, `text-neutral-granite`
+  - Borders / surfaces: `border-neutral-cloud`, `bg-neutral-white`, `bg-neutral-milk`
+  - Accent (progress, step indicators): `bg-accent-blue`, `text-accent-blue`
 - Use arbitrary values sparingly: `w-[100px]` only when necessary
 - Responsive prefixes: `sm:`, `md:`, `lg:`, `xl:`
-- Color scheme: Use Tailwind defaults (blue-600, gray-900, etc.)
 - Dark mode support via CSS variables in `globals.css`
 
 ### Project Structure
@@ -110,22 +113,41 @@ import { formatDate } from '@/lib/utils';
 ```
 src/
   app/              # Next.js App Router
-    layout.tsx      # Root layout with fonts
+    layout.tsx      # Root layout with Geist local fonts
     page.tsx        # Home page
-    globals.css     # Global styles
-    fonts/          # Local font files
+    globals.css     # Global styles and SBB palette CSS variables
+    fonts/          # Local font files (GeistVF.woff, GeistMonoVF.woff)
   components/       # React components
-    *.tsx
+    FirmwareUploader.tsx
+    LanguageSelector.tsx
+    MarketingSection.tsx
+    VersionNotes.tsx
+    Footer.tsx
   lib/              # Utilities, hooks, contexts
     i18n/           # Internationalization
       I18nContext.tsx
       translations.ts
-public/             # Static assets
+public/
+  firmware/         # Firmware binaries, organised by version subdirectory
+    versions.json
+    1.2.1/
+      bootloader.bin
+      partitions.bin
+      firmware.bin
+    1.x.x/          # One subdirectory per released version
 ```
+
+### Firmware Directory Layout
+
+Each firmware release lives in its own subdirectory under `public/firmware/<version>/`. The `versions.json` manifest at `public/firmware/versions.json` lists all available versions in reverse-chronological order (newest first). The uploader fetches files from `/firmware/<version>/<filename>`.
+
+When adding a new firmware release:
+1. Create `public/firmware/<new-version>/` and copy the three `.bin` files into it.
+2. Prepend a new entry to the `versions` array in `versions.json`.
 
 ### Internationalization (i18n)
 
-- Supported languages: English (en), German (de), French (fr), Italian (it)
+- Supported languages: English (en), German (de) — **default**, French (fr), Italian (it)
 - All user-facing strings in `translations.ts`
 - Use `useI18n()` hook to access translations
 - Access nested translations via destructuring: `const { uploader } = t;`
@@ -133,17 +155,26 @@ public/             # Static assets
 ### Environment & Browser APIs
 
 - Check for browser APIs before use: `'serial' in navigator`
-- Handle SSR hydration with `mounted` state check
+- Handle SSR hydration with `mounted` state check (render a skeleton until mounted)
 - Store user preferences in `localStorage` when appropriate
+
+### Serial Port / esptool-js Patterns
+
+- **Do NOT call `port.open()` manually** — `Transport.connect()` (called internally by `esploader.main()`) opens the port. Opening it beforehand causes a "port is already open" error.
+- **Cleanup order matters**: disconnect the `Transport` first (releases stream locks), then close the `SerialPort`. Closing the port while a Transport reader/writer is active throws "stream is locked".
+- Store the port and transport in `useRef` so they persist across re-renders without triggering effects.
+- USB vendor IDs filtered on `navigator.serial.requestPort`: CP210x (0x10c4), CH340 (0x1a86), FTDI (0x0403), Espressif (0x303a).
+- esptool-js expects firmware data as a **binary string** (not base64). Use `arrayBufferToBinaryString` helper to convert `ArrayBuffer` responses before passing to `writeFlash`.
 
 ## Dependencies
 
 Key libraries used:
-- `next` - React framework
-- `react`, `react-dom` - React
-- `esptool-js` - ESP32 flashing library
+- `next` - React framework (v14)
+- `react`, `react-dom` - React (v18)
+- `esptool-js` (^0.5.7) - ESP32 flashing library
 - `lucide-react` - Icons
 - `tailwindcss` - Styling
+- `@types/w3c-web-serial` - TypeScript types for Web Serial API
 - `typescript` - Type checking
 - `eslint` - Linting (Next.js config)
 
@@ -152,5 +183,7 @@ Key libraries used:
 - **Static export**: Configured in `next.config.mjs` with `output: 'export'`
 - **Dist directory**: Output goes to `dist/` (not `.next/`)
 - **Images**: Unoptimized for static export (`images: { unoptimized: true }`)
-- **Web Serial API**: Requires Chrome, Edge, or Opera for ESP32 flashing
+- **Web Serial API**: Requires Chrome, Edge, or Opera for ESP32 flashing; HTTPS or localhost required
+- **Default language**: German (`de`)
+- **Flash baud rate**: 921600 (ROM baud: 115200)
 - No test suite configured - add tests if implementing new features
