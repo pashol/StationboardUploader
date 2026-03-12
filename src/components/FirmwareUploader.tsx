@@ -181,8 +181,9 @@ export default function FirmwareUploader() {
         throw new Error('Could not close the serial port. Please unplug and replug the device.');
       }
 
-      await portRef.current.open({ baudRate: SERIAL_BAUDRATE });
-
+      // Do NOT call port.open() here — Transport.connect() (called internally
+      // by esploader.main()) opens the port itself. Opening it here too causes
+      // "The port is already open" on the Transport's connect call.
       const transport = new Transport(portRef.current);
       transportRef.current = transport;
       
