@@ -10,12 +10,13 @@ Web-based firmware uploader for [StationBoard](https://github.com/pashol/Station
 
 ## Features
 
-- 🚀 **Browser-based flashing** - No software installation required
-- 🌐 **Multi-language support** - English, German, French, Italian
-- 📱 **Mobile-friendly** - Works on smartphones and tablets
-- ⚡ **Fast flashing** - Optimized for ESP32 devices
-- 🔄 **Version selection** - Choose from available firmware versions
-- 📊 **Progress tracking** - Real-time flash progress with visual feedback
+- **Browser-based flashing** - No software installation required
+- **Multi-language support** - English, German, French, Italian (German default)
+- **Mobile-friendly** - Works on smartphones and tablets
+- **Fast flashing** - Optimized for ESP32 devices at 921600 baud
+- **Version selection** - Choose from available firmware versions
+- **Progress tracking** - Real-time flash progress with visual feedback
+- **Auto device detection** - Supports CP210x, CH340, FTDI and Espressif USB chips
 
 ## Supported Hardware
 
@@ -27,17 +28,17 @@ Web-based firmware uploader for [StationBoard](https://github.com/pashol/Station
 
 The Web Serial API is required for flashing firmware. Supported browsers:
 
-- ✅ Google Chrome (recommended)
-- ✅ Microsoft Edge
-- ✅ Opera
-- ❌ Safari (not supported)
-- ❌ Firefox (not supported)
+- Google Chrome (recommended)
+- Microsoft Edge
+- Opera
+- Safari (not supported)
+- Firefox (not supported)
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 
 ### Development
@@ -76,9 +77,10 @@ npm run lint
 ```
 src/
 ├── app/                    # Next.js App Router
-│   ├── layout.tsx         # Root layout
+│   ├── layout.tsx         # Root layout with Geist fonts
 │   ├── page.tsx           # Home page
-│   └── globals.css        # Global styles
+│   ├── globals.css        # Global styles and SBB color palette
+│   └── fonts/             # Local font files (GeistVF, GeistMonoVF)
 ├── components/            # React components
 │   ├── FirmwareUploader.tsx   # Main flashing component
 │   ├── LanguageSelector.tsx   # Language switcher
@@ -91,38 +93,44 @@ src/
         └── translations.ts
 
 public/
-└── firmware/              # Firmware binaries
-    ├── bootloader.bin
-    ├── partitions.bin
-    ├── firmware.bin
-    └── versions.json
+└── firmware/              # Firmware binaries organised by version
+    ├── versions.json
+    ├── 1.2.1/
+    │   ├── bootloader.bin
+    │   ├── partitions.bin
+    │   └── firmware.bin
+    ├── 1.2.0/
+    ├── 1.1.0/
+    └── 1.0.0/
 ```
 
 ## How It Works
 
 1. **Connect Device** - Plug your ESP32-2432S028R via USB
-2. **Select Version** - Choose firmware version from dropdown
-3. **Click Flash** - Browser connects via Web Serial API
-4. **Wait** - Firmware downloads and flashes automatically
-5. **Done!** - Device restarts with new firmware
+2. **Select Version** - Choose firmware version from dropdown (latest pre-selected)
+3. **Click Flash** - Browser requests serial port access via Web Serial API
+4. **Wait** - Firmware downloads and flashes automatically; progress shown in real time
+5. **Done!** - Device resets and boots the new firmware automatically
 
 ## Firmware Format
 
-The uploader expects firmware files in `public/firmware/`:
+Firmware files live under `public/firmware/<version>/`:
 
 - `bootloader.bin` - ESP32 bootloader (address: 0x1000)
 - `partitions.bin` - Partition table (address: 0x8000)
 - `firmware.bin` - Main application (address: 0x10000)
-- `versions.json` - Version metadata
+- `versions.json` - Version metadata (at `public/firmware/versions.json`)
 
 Example `versions.json`:
 ```json
 {
   "versions": [
     {
-      "version": "1.0.0",
-      "date": "2024-01-15",
-      "changes": ["Initial release"],
+      "version": "1.2.1",
+      "date": "2026-01-29",
+      "changes": [
+        "Fix night mode refresh after temporary wake or exit"
+      ],
       "files": {
         "bootloader": "bootloader.bin",
         "partitions": "partitions.bin",
@@ -133,13 +141,15 @@ Example `versions.json`:
 }
 ```
 
+The array is ordered newest-first. The uploader automatically selects the first entry as the default version.
+
 ## Internationalization
 
 Supported languages:
-- 🇬🇧 English (en)
-- 🇩🇪 German (de)
-- 🇫🇷 French (fr)
-- 🇮🇹 Italian (it)
+- English (en)
+- German (de) — default
+- French (fr)
+- Italian (it)
 
 Translations are stored in `src/lib/i18n/translations.ts`.
 
@@ -166,4 +176,4 @@ MIT License - see [LICENSE](./LICENSE) for details.
 
 ---
 
-Made with ❤️ in Switzerland
+Made with love in Switzerland
