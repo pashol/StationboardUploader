@@ -6,7 +6,7 @@
 
 Web-based firmware uploader for [StationBoard](https://github.com/pashol/Stationboard) - a Swiss public transport display for your home or office. Flash your ESP32-2432S028R directly from the browser without installing any software.
 
-![StationBoard Uploader Screenshot](https://github.com/pashol/StationboardUploader/raw/main/Screenshot.png)
+![StationBoard Uploader Screenshot](Screenshot.png)
 
 ## Features
 
