@@ -1,6 +1,20 @@
 {
   "versions": [
     {
+      "version": "1.3.0",
+      "date": "2026-09-10",
+      "changes": [
+        "Improve WiFi recovery and refresh behavior after sleep or connection loss",
+        "Keep cached transport data available while the network is unavailable",
+        "Harden network requests, configuration handling, and OTA updates"
+      ],
+      "files": {
+        "bootloader": "stationboard-v1.3.0-bootloader.bin",
+        "partitions": "stationboard-v1.3.0-partitions.bin",
+        "firmware": "stationboard-v1.3.0-firmware.bin"
+      }
+    },
+    {
       "version": "1.2.2",
       "date": "2026-03-19",
       "changes": [
